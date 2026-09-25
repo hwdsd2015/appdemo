@@ -34,27 +34,30 @@
         <option value="neo">Near-Earth Asteroids (NeoWs)</option>
         <option value="flares">Solar Flares (DONKI)</option>
         <option value="apod">Astronomy Picture of the Day (APOD)</option>
-        <!-- The rest of the APIs listed at api.nasa.gov. They are disabled until
-             nasadata.js and simulate.js know how to fetch and summarize them. -->
-        <optgroup label="Not supported yet">
-          <option value="eonet" disabled>Earth Observatory Natural Event Tracker (EONET)</option>
-          <option value="epic" disabled>Earth Polychromatic Imaging Camera (EPIC)</option>
-          <option value="exoplanet" disabled>Exoplanet Archive (Exoplanet)</option>
-          <option value="gibs" disabled>Global Imagery Browse Services (GIBS)</option>
-          <option value="insight" disabled>Mars Weather Service (InSight)</option>
-          <option value="images" disabled>NASA Image and Video Library</option>
-          <option value="osdr" disabled>Open Science Data Repository (OSDR)</option>
-          <option value="ssc" disabled>Satellite Situation Center (SSC)</option>
-          <option value="ssd-cneos" disabled>Solar System Dynamics / Near-Earth Object Studies (SSD/CNEOS)</option>
-          <option value="techport" disabled>NASA Technology Projects (Techport)</option>
-          <option value="techtransfer" disabled>Patents, Software &amp; Tech Transfer (TechTransfer)</option>
-          <option value="tle" disabled>Two-Line Element Sets (TLE API)</option>
-          <option value="trek" disabled>Vesta/Moon/Mars Trek Map Tiles (WMTS)</option>
+        <option value="eonet">Earth Observatory Natural Event Tracker (EONET)</option>
+        <option value="epic">Earth Polychromatic Imaging Camera (EPIC)</option>
+        <option value="gibs">Global Imagery Browse Services (GIBS)</option>
+        <option value="insight">Mars Weather Service (InSight)</option>
+        <option value="images">NASA Image and Video Library</option>
+        <option value="ssc">Satellite Situation Center (SSC)</option>
+        <option value="techport">NASA Technology Projects (Techport)</option>
+        <option value="tle">Two-Line Element Sets (TLE API)</option>
+        <option value="trek">Vesta/Moon/Mars Trek Map Tiles (WMTS)</option>
+        <!-- These hosts block browser requests (no CORS header), so data.html
+             fetches them through server.py's /proxy. -->
+        <optgroup label="Needs python3 server.py">
+          <option value="exoplanet">Exoplanet Archive (Exoplanet)</option>
+          <option value="osdr">Open Science Data Repository (OSDR)</option>
+          <option value="ssd-cneos">Solar System Dynamics / Near-Earth Object Studies (SSD/CNEOS)</option>
+          <option value="techtransfer">Patents, Software &amp; Tech Transfer (TechTransfer)</option>
         </optgroup>
       </select>
 
-      <label for="days">How many days? <span class="hint">(1 - 7, ending today)</span></label>
+      <label for="days">How many days? <span class="hint">(1 - 365, ending today)</span></label>
       <input type="number" id="days" min="1" max="365" value="7">
+
+      <label for="query">Search word <span class="hint">(Images, TechTransfer, TLE only)</span></label>
+      <input type="text" id="query" value="">
 
       <label for="apiKey">API key <span class="hint">(get your own at api.nasa.gov)</span></label>
       <input type="text" id="apiKey" value="DEMO_KEY">
@@ -83,8 +86,8 @@
       var apiKey = document.getElementById("apiKey").value.trim() || "DEMO_KEY";
       var storageKey = document.getElementById("storageKey").value.trim();
 
-      if (!(days >= 1 && days <= 7)) {
-        document.getElementById("error").textContent = "Days must be between 1 and 7.";
+      if (!(days >= 1 && days <= 365)) {
+        document.getElementById("error").textContent = "Days must be between 1 and 365.";
         return;
       }
       if (storageKey === "") {
@@ -102,7 +105,8 @@
         apiKey: apiKey,
         storageKey: storageKey,
         startDate: toYMD(start),
-        endDate: toYMD(end)
+        endDate: toYMD(end),
+        query: document.getElementById("query").value.trim()
       };
 
       try {

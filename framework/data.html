@@ -89,7 +89,7 @@
       var raw = JSON.parse(localStorage.getItem(config.storageKey));
 
       // simulate.js: raw NASA data -> summary object
-      var summary = summarizeNasaData(config.dataset, raw);
+      var summary = summarizeNasaData(config.dataset, raw, config);
       localStorage.setItem(config.storageKey + "_summary", JSON.stringify(summary));
       console.log("Summary:", summary);
 
