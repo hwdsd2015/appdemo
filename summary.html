@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pizza Demo - Order Summary</title>
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 24px 28px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #1a4f8b; margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid #e3e8ee; }
+    th { color: #555; width: 40%; }
+    .total { font-size: 20px; font-weight: bold; color: #1a4f8b; }
+    pre {
+      background: #f6f8fa;
+      border: 1px solid #e3e8ee;
+      border-radius: 6px;
+      padding: 12px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+    button {
+      background-color: #1a4f8b;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      margin-right: 8px;
+    }
+    button:hover { background-color: #14406f; }
+    .empty { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Order Summary</h1>
+    <div id="content"></div>
+  </div>
+
+  <script>
+    var content = document.getElementById("content");
+
+    // Anything the user typed goes through this before we put it in the page,
+    // so a stray < or & cannot break the HTML.
+    function esc(text) {
+      var div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Read the JSON string back out of localStorage
+    var json = null;
+    try {
+      json = localStorage.getItem("pizzaOrder");
+    } catch (e) {
+      json = null;
+    }
+
+    if (!json) {
+      content.innerHTML =
+        '<p class="empty">No order found.</p>' +
+        '<button onclick="location.href=\'order.html\'">Start an Order</button>';
+    } else {
+      // Turn the JSON string back into an object
+      var order = JSON.parse(json);
+
+      var toppings = order.toppings.length ? esc(order.toppings.join(", ")) : "None";
+      var notes    = order.notes ? esc(order.notes) : "-";
+      var when     = new Date(order.orderedAt).toLocaleString();
+
+      content.innerHTML =
+        '<table>' +
+          '<tr><th>Name</th><td>'     + esc(order.name) + '</td></tr>' +
+          '<tr><th>Size</th><td>'     + esc(order.size) + '</td></tr>' +
+          '<tr><th>Crust</th><td>'    + esc(order.crust) + '</td></tr>' +
+          '<tr><th>Toppings</th><td>' + toppings + '</td></tr>' +
+          '<tr><th>Notes</th><td>'    + notes + '</td></tr>' +
+          '<tr><th>Ordered</th><td>'  + when + '</td></tr>' +
+          '<tr><th>Total</th><td class="total">$' + order.total.toFixed(2) + '</td></tr>' +
+        '</table>' +
+        '<h3>Raw JSON in localStorage</h3>' +
+        '<pre>' + esc(JSON.stringify(order, null, 2)) + '</pre>' +
+        '<button id="againBtn">Order Again</button>' +
+        '<button id="clearBtn">Clear Order</button>';
+
+      document.getElementById("againBtn").addEventListener("click", function () {
+        window.location.href = "order.html";
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", function () {
+        localStorage.removeItem("pizzaOrder");
+        window.location.reload();
+      });
+    }
+  </script>
+</body>
+</html>

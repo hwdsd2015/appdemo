@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pizza Demo - Order</title>
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    .card {
+      background: #ffffff;
+      max-width: 460px;
+      margin: 0 auto;
+      padding: 24px 28px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #1a4f8b; margin-top: 0; }
+    label { display: block; margin-top: 16px; font-weight: bold; color: #333; }
+    input[type="text"], select {
+      width: 100%;
+      padding: 8px;
+      font-size: 15px;
+      margin-top: 4px;
+      border: 1px solid #c3ccd6;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .toppings label {
+      font-weight: normal;
+      margin-top: 6px;
+    }
+    button {
+      background-color: #1a4f8b;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 24px;
+      width: 100%;
+    }
+    button:hover { background-color: #14406f; }
+    .error { color: #c0392b; margin-top: 12px; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Build Your Pizza</h1>
+
+    <form id="orderForm">
+      <label for="name">Your name</label>
+      <input type="text" id="name" placeholder="e.g. Howard">
+
+      <label for="size">Size</label>
+      <select id="size">
+        <option value="Small">Small - $8</option>
+        <option value="Medium" selected>Medium - $11</option>
+        <option value="Large">Large - $14</option>
+      </select>
+
+      <label for="crust">Crust</label>
+      <select id="crust">
+        <option value="Thin">Thin</option>
+        <option value="Regular" selected>Regular</option>
+        <option value="Stuffed">Stuffed (+$2)</option>
+      </select>
+
+      <label>Toppings ($1.50 each)</label>
+      <div class="toppings">
+        <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
+        <label><input type="checkbox" value="Mushroom"> Mushroom</label>
+        <label><input type="checkbox" value="Onion"> Onion</label>
+        <label><input type="checkbox" value="Extra Cheese"> Extra Cheese</label>
+      </div>
+
+      <label for="notes">Notes</label>
+      <input type="text" id="notes" placeholder="e.g. cut into squares">
+
+      <div class="error" id="error"></div>
+
+      <button type="submit">Submit Order</button>
+    </form>
+  </div>
+
+  <script>
+    var SIZE_PRICE  = { "Small": 8, "Medium": 11, "Large": 14 };
+    var CRUST_PRICE = { "Thin": 0, "Regular": 0, "Stuffed": 2 };
+    var TOPPING_PRICE = 1.5;
+
+    var form = document.getElementById("orderForm");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();   // stop the browser from reloading the page
+
+      var name = document.getElementById("name").value.trim();
+      if (name === "") {
+        document.getElementById("error").textContent = "Please enter your name.";
+        return;
+      }
+
+      // Collect every checked topping into an array
+      var toppings = [];
+      var boxes = document.querySelectorAll('.toppings input[type="checkbox"]');
+      for (var i = 0; i < boxes.length; i++) {
+        if (boxes[i].checked) {
+          toppings.push(boxes[i].value);
+        }
+      }
+
+      var size  = document.getElementById("size").value;
+      var crust = document.getElementById("crust").value;
+
+      var total = SIZE_PRICE[size] + CRUST_PRICE[crust] + toppings.length * TOPPING_PRICE;
+
+      // The order as a plain JavaScript object
+      var order = {
+        name: name,
+        size: size,
+        crust: crust,
+        toppings: toppings,
+        notes: document.getElementById("notes").value.trim(),
+        total: total,
+        orderedAt: new Date().toISOString()
+      };
+
+      // Turn the object into a JSON string, because localStorage
+      // can only store strings.
+      var json = JSON.stringify(order);
+      console.log("Saving order JSON:", json);
+
+      try {
+        localStorage.setItem("pizzaOrder", json);
+      } catch (e) {
+        document.getElementById("error").textContent =
+          "Could not save the order (browser storage is blocked).";
+        return;
+      }
+
+      window.location.href = "summary.html";
+    });
+  </script>
+</body>
+</html>

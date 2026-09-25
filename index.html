@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pizza Demo - Loading</title>
+
+  <!-- Way 1: pure HTML auto-forward immediately -->
+  <meta http-equiv="refresh" content="0; url=home.html">
+
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 { color: #1a4f8b; }
+    p  { color: #555; }
+    a  { color: #1a4f8b; }
+  </style>
+</head>
+<body>
+  <h1>Welcome</h1>
+  <p>Taking you to the home page...</p>
+  <p>If nothing happens, <a href="home.html">click here</a>.</p>
+
+  <script>
+    // Way 2: same thing in JavaScript.
+    // replace() does not add this page to the browser history,
+    // so the Back button will not bounce the user back here.
+    window.location.replace("home.html");
+  </script>
+</body>
+</html>

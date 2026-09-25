@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Pizza Demo - Home</title>
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+    h1 { color: #1a4f8b; }
+    p  { color: #555; font-size: 18px; }
+    button {
+      background-color: #1a4f8b;
+      color: #ffffff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #14406f; }
+  </style>
+</head>
+<body>
+  <h1>Tony's Pizza</h1>
+  <p>Fresh pizza, baked while you wait.</p>
+  <button id="orderBtn">Order Now</button>
+
+  <script>
+    document.getElementById("orderBtn").addEventListener("click", function () {
+      window.location.href = "order.html";
+    });
+  </script>
+</body>
+</html>

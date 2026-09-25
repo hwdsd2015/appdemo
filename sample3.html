@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sample 3 - Button Changes Text Color</title>
+  <style>
+    body {
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+    p {
+      color: #1a4f8b;
+      font-size: 20px;
+    }
+    button {
+      background-color: #1a4f8b;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #14406f;
+    }
+  </style>
+</head>
+<body>
+  <p id="message">Hello, this is my first page.</p>
+  <button id="colorBtn">Change Text Color</button>
+
+  <script>
+    var colors = ["#1a4f8b", "#c0392b", "#27ae60", "#8e44ad", "#d35400"];
+    var index = 0;
+
+    var button = document.getElementById("colorBtn");
+    var message = document.getElementById("message");
+
+    button.addEventListener("click", function () {
+      index = (index + 1) % colors.length;
+      message.style.color = colors[index];
+    });
+  </script>
+</body>
+</html>
