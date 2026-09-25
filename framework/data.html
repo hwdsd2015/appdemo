@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>NASA Demo - Data</title>
+  <style>
+    body { background-color: #0b1020; font-family: Arial, sans-serif; padding: 40px; color: #333; }
+    .card {
+      background: #ffffff; max-width: 820px; margin: 0 auto 24px; padding: 24px 28px;
+      border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    h1, h2 { color: #1a4f8b; margin-top: 0; }
+    pre {
+      background: #f4f6f8; padding: 12px; border-radius: 6px; max-height: 220px;
+      overflow: auto; font-size: 12px;
+    }
+    button {
+      background-color: #1a4f8b; color: #ffffff; border: none; padding: 12px 24px;
+      font-size: 16px; border-radius: 6px; cursor: pointer; margin-top: 12px;
+    }
+    button:hover { background-color: #14406f; }
+    button:disabled { background-color: #9aa9bb; cursor: default; }
+    .error { color: #c0392b; }
+    .stats { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    .stat { background: #f4f6f8; padding: 10px 14px; border-radius: 6px; }
+    .stat b { display: block; font-size: 18px; color: #1a4f8b; }
+    #scene { width: 100%; height: 440px; border-radius: 6px; overflow: hidden; }
+    #tooltip {
+      position: fixed; display: none; background: rgba(0,0,0,0.8); color: #fff;
+      padding: 6px 10px; border-radius: 4px; font-size: 13px; pointer-events: none;
+    }
+    #summaryCard { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Step 1: fetch raw data -->
+  <div class="card">
+    <h1>Raw NASA Data</h1>
+    <p id="status">Loading...</p>
+    <pre id="raw"></pre>
+    <button id="nextBtn" disabled>Next: Summarize &amp; Visualize</button>
+    <button id="backBtn">Back</button>
+  </div>
+
+  <!-- Step 2: summary + three.js scene (hidden until Next is clicked) -->
+  <div class="card" id="summaryCard">
+    <h2 id="summaryTitle"></h2>
+    <div class="stats" id="stats"></div>
+    <p><small id="unit"></small></p>
+    <div id="scene"></div>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <!-- three.js as a plain script: it creates a global THREE object -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="nasadata.js"></script>
+  <script src="simulate.js"></script>
+  <script>
+    var statusEl = document.getElementById("status");
+    var nextBtn = document.getElementById("nextBtn");
+
+    document.getElementById("backBtn").addEventListener("click", function () {
+      window.location.href = "app.html";
+    });
+
+    // Read the choices app.html saved
+    var config = JSON.parse(localStorage.getItem("nasaConfig") || "null");
+
+    if (!config) {
+      statusEl.innerHTML = '<span class="error">No settings found. Go back and choose data first.</span>';
+    } else {
+      statusEl.textContent = "Fetching " + config.dataset + " from " + config.startDate +
+                             " to " + config.endDate + "...";
+
+      fetchNasaData(config)
+        .then(function (raw) {
+          statusEl.textContent = "Saved to localStorage key \"" + config.storageKey + "\". Preview:";
+          document.getElementById("raw").textContent = JSON.stringify(raw, null, 2).slice(0, 5000);
+          nextBtn.disabled = false;
+        })
+        .catch(function (err) {
+          statusEl.innerHTML = '<span class="error">' + err.message + '</span>';
+        });
+    }
+
+    nextBtn.addEventListener("click", function () {
+      // Read the raw data back from localStorage (the key the user chose)
+      var raw = JSON.parse(localStorage.getItem(config.storageKey));
+
+      // simulate.js: raw NASA data -> summary object
+      var summary = summarizeNasaData(config.dataset, raw);
+      localStorage.setItem(config.storageKey + "_summary", JSON.stringify(summary));
+      console.log("Summary:", summary);
+
+      // Show the headline numbers
+      document.getElementById("summaryTitle").textContent = summary.title;
+      document.getElementById("unit").textContent = "Bar height = " + summary.unit;
+      document.getElementById("stats").innerHTML = summary.stats.map(function (s) {
+        return '<div class="stat">' + s.label + '<b>' + s.value + '</b></div>';
+      }).join("");
+
+      // Show the card first so the scene has a real width/height, then draw
+      document.getElementById("summaryCard").style.display = "block";
+      renderSummary3D(summary, document.getElementById("scene"), document.getElementById("tooltip"));
+      document.getElementById("summaryCard").scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
